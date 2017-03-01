@@ -34,7 +34,7 @@ require 'vendor/autoload.php';
 use Infomaniak\Api;
 
 $token = '123456789';
-$client = new Api($token);
+$client = new Api(['token' => $token]);
 
 // Ping example
 $result = $client->ping();

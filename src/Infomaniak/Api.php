@@ -21,7 +21,6 @@ use Infomaniak\Deserializers\ApiDeserializer;
  * @method Api deleteMailbox(array $params) Delete a given Mailbox
  * @method Api addMailbox(array $params) Create a new Mailbox
  */
-
 final class Api extends GuzzleClient {
 
 	/** @var string */
@@ -49,14 +48,21 @@ final class Api extends GuzzleClient {
 	/**
 	 * Api constructor.
 	 *
-	 * @param string $bearer
+	 * @param array  $params
 	 * @param string $endpoint
 	 *
-	 * @return Api
+	 * @throws ApiException if token is not provided
 	 */
-	public function __construct($bearer, $endpoint = 'default') {
+	public function __construct($params, $endpoint = 'default') {
+		if (isset($params['token'])) {
+			$token = $params['token'];
+		} elseif (isset($params['client_api']) && $params['client_secret']) {
+			throw new ApiException("Unsupported OAuth provider");
+		} else {
+			throw new ApiException("Unknown provided endpoint");
+		}
 		$this->initEndpoint($endpoint);
-		$this->initClientApi($bearer);
+		$this->initClientApi($token);
 		$this->initDescription();
 
 		return parent::__construct($this->client, self::getApiDescription(), null, new ApiDeserializer(self::$description, true));
@@ -84,13 +90,13 @@ final class Api extends GuzzleClient {
 	/**
 	 * Configure and init Guzzle Client
 	 *
-	 * @param string $bearer
+	 * @param string $token
 	 */
-	private function initClientApi($bearer) {
+	private function initClientApi($token) {
 		$this->config['connect_timeout'] = self::CONNECT_TIMEOUT;
 		$this->config['timeout'] = self::TIMEOUT;
 		$this->config['protocols'] = ['https'];
-		$this->config['headers'] = ['authorization' => 'Bearer ' . $bearer];
+		$this->config['headers'] = ['authorization' => 'Bearer ' . $token];
 		$this->client = new Client($this->config);
 	}
 
