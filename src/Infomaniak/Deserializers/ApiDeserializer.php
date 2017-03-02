@@ -33,11 +33,13 @@ final class ApiDeserializer extends Deserializer {
 		$operation = Api::getApiOperationDescription($command->getName());
 		$model = $operation->getServiceDescription()->getModel($operation->getResponseModel());
 		$wrapper = $model->getData('wrapper');
+
 		if (!is_null($wrapper) && class_exists($wrapper)) {
 			return new $wrapper($result->toArray());
-		} else {
-			return new ApiResult($result->toArray());
 		}
+
+		return new ApiResult($result->toArray());
+
 	}
 
 

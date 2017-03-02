@@ -65,7 +65,7 @@ final class Api extends GuzzleClient {
 		$this->initClientApi($token);
 		$this->initDescription();
 
-		return parent::__construct($this->client, self::getApiDescription(), null, new ApiDeserializer(self::$description, true));
+		parent::__construct($this->client, self::getApiDescription(), null, new ApiDeserializer(self::$description, true));
 	}
 
 
